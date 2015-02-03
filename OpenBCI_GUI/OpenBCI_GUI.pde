@@ -640,6 +640,16 @@ void processNewData() {
     //make a copy of the data that we'll apply processing to.  This will be what is displayed on the full montage
     dataBuffY_filtY_uV[Ichan] = dataBuffY_uV[Ichan].clone();
   }
+  
+  // HACK: move the filter processing before the FFT calculation
+  //apply additional processing for the time-domain montage plot (ie, filtering)
+  eegProcessing.process(yLittleBuff_uV,dataBuffY_uV,dataBuffY_filtY_uV,fftBuff);
+  
+  //apply user processing
+  // ...yLittleBuff_uV[Ichan] is the most recent raw data since the last call to this processing routine
+  // ...dataBuffY_filtY_uV[Ichan] is the full set of filtered data as shown in the time-domain plot in the GUI
+  // ...fftBuff[Ichan] is the FFT data structure holding the frequency spectrum as shown in the freq-domain plot in the GUI
+  eegProcessing_user.process(yLittleBuff_uV,dataBuffY_uV,dataBuffY_filtY_uV,fftBuff);
     
   //if you want to, re-reference the montage to make it be a mean-head reference
   if (false) rereferenceTheMontage(dataBuffY_filtY_uV);
@@ -651,7 +661,8 @@ void processNewData() {
     for (int I=0; I < fftBuff[Ichan].specSize(); I++) prevFFTdata[I] = fftBuff[Ichan].getBand(I); //copy the old spectrum values
     
     //prepare the data for the new FFT
-    float[] fooData_raw = dataBuffY_uV[Ichan];  //use the raw data for the FFT
+    // HACK: use filtered data for the FFT
+    float[] fooData_raw = dataBuffY_filtY_uV[Ichan];  //use the raw data for the FFT
     fooData_raw = Arrays.copyOfRange(fooData_raw, fooData_raw.length-Nfft, fooData_raw.length);   //trim to grab just the most recent block of data
     float meanData = mean(fooData_raw);  //compute the mean
     for (int I=0; I < fooData_raw.length; I++) fooData_raw[I] -= meanData; //remove the mean (for a better looking FFT
@@ -703,14 +714,7 @@ void processNewData() {
     } //end loop over FFT bins
   } //end the loop over channels.
   
-  //apply additional processing for the time-domain montage plot (ie, filtering)
-  eegProcessing.process(yLittleBuff_uV,dataBuffY_uV,dataBuffY_filtY_uV,fftBuff);
   
-  //apply user processing
-  // ...yLittleBuff_uV[Ichan] is the most recent raw data since the last call to this processing routine
-  // ...dataBuffY_filtY_uV[Ichan] is the full set of filtered data as shown in the time-domain plot in the GUI
-  // ...fftBuff[Ichan] is the FFT data structure holding the frequency spectrum as shown in the freq-domain plot in the GUI
-  eegProcessing_user.process(yLittleBuff_uV,dataBuffY_uV,dataBuffY_filtY_uV,fftBuff);
   
   //look to see if the latest data is railed so that we can notify the user on the GUI
   for (int Ichan=0;Ichan < nchan; Ichan++) is_railed[Ichan].update(dataPacketBuff[lastReadDataPacketInd].values[Ichan]);
