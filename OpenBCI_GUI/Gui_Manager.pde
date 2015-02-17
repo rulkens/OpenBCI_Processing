@@ -45,6 +45,8 @@ class Gui_Manager {
   Button smoothingButton;
   Button maxDisplayFreqButton;
   Button showPolarityButton;
+  // EDIT: Alex - add a button to toggle filtered FFT
+  Button toggleFilterFFTButton;
 
   //these two buttons toggle between EEG graph state (they are mutually exclusive states)
   Button showMontageButton; // to show uV time graph as opposed to channel controller
@@ -61,7 +63,10 @@ class Gui_Manager {
   boolean showSpectrogram;
   int whichChannelForSpectrogram;
 
-  //define some color variables
+  // EDIT: Alex - add filter FFT toggle
+  boolean postFilterFFT = false;
+
+ // EDIT: Alex - add filter FFT toggle //define some color variables
   int bgColorGraphs = 255;
   int gridColor = 200;
   int borderColor = 50;
@@ -263,6 +268,10 @@ class Gui_Manager {
     w = 70;    
     h = 26;
     y = 2;
+    
+    // EDIT - Alex: add toggle filter button
+    x = calcButtonXLocation(Ibut++, win_x, w, xoffset,gutter_between_buttons);
+    toggleFilterFFTButton = new Button(x,y,w,h,"Toggle filter\nFFT",fontInfo.buttonLabel_size);
 
     x = calcButtonXLocation(Ibut++, win_x, w, xoffset,gutter_between_buttons);
     maxDisplayFreqButton = new Button(x,y,w,h,"Max Freq\n" + round(maxDisplayFreq_Hz[maxDisplayFreq_ind]) + " Hz",fontInfo.buttonLabel_size);
@@ -305,6 +314,13 @@ class Gui_Manager {
   private int calcButtonXLocation(int Ibut,int win_x,int w, int xoffset, float gutter_between_buttons) {
     // return xoffset + (Ibut * (w + (int)(gutter_between_buttons*win_x)));
     return width - ((Ibut+1) * (w + 2)) - 1;
+  }
+  
+  // EDIT - Alex: add toggle for FFT filters
+  public void toggleFilterFFT(){
+    postFilterFFT = !postFilterFFT;
+    println("Toggle Filter FFT: " + postFilterFFT);
+    // TODO: redraw FFT
   }
   
   public void setDefaultVertScale(float val_uV) {
@@ -406,7 +422,7 @@ class Gui_Manager {
     //gSpectrogram.setYAxisTickSpacing(foo_Hz);
     
     if (maxDisplayFreqButton != null) maxDisplayFreqButton.setString("Max Freq\n" + round(maxDisplayFreq_Hz[maxDisplayFreq_ind]) + " Hz");
-  }  
+  }
   
   
   public void setDoNotPlotOutsideXlim(boolean state) {
@@ -841,6 +857,8 @@ class Gui_Manager {
         smoothingButton.draw();
         showPolarityButton.draw();
         maxDisplayFreqButton.draw();
+    toggleFilterFFTButton.draw();
+        
         break;
       default:  //assume GUI_PAGE_CHANNEL_ONOFF:
         //show channel buttons
@@ -921,9 +939,11 @@ class Gui_Manager {
     showPolarityButton.setIsActive(false);
     maxDisplayFreqButton.setIsActive(false);
     biasButton.setIsActive(false);
+    toggleFilterFFTButton.setIsActive(false);
   }
  
 };
+
 
 
 
