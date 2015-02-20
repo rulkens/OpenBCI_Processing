@@ -893,6 +893,7 @@ void mousePressed() {
           if (gui.toggleFilterFFTButton.isMouseHere()) {
             gui.toggleFilterFFTButton.setIsActive(true);
             gui.toggleFilterFFT();
+            gui.toggleFilterFFTButton.but_txt = gui.toggleFilterFFTButtonText();
           }
           
     //      //check the detection button

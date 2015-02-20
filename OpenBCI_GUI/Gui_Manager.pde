@@ -45,7 +45,7 @@ class Gui_Manager {
   Button smoothingButton;
   Button maxDisplayFreqButton;
   Button showPolarityButton;
-  // EDIT: Alex - add a button to toggle filtered FFT
+  // EDIT: add a button to toggle filtered FFT
   Button toggleFilterFFTButton;
 
   //these two buttons toggle between EEG graph state (they are mutually exclusive states)
@@ -65,8 +65,11 @@ class Gui_Manager {
 
   // EDIT: Alex - add filter FFT toggle
   boolean postFilterFFT = false;
+  public String toggleFilterFFTButtonText(){
+      return (postFilterFFT?"Post":"Pre")+"-filter\nFFT";
+  }
 
- // EDIT: Alex - add filter FFT toggle //define some color variables
+ //define some color variables
   int bgColorGraphs = 255;
   int gridColor = 200;
   int borderColor = 50;
@@ -271,7 +274,7 @@ class Gui_Manager {
     
     // EDIT - Alex: add toggle filter button
     x = calcButtonXLocation(Ibut++, win_x, w, xoffset,gutter_between_buttons);
-    toggleFilterFFTButton = new Button(x,y,w,h,"Toggle filter\nFFT",fontInfo.buttonLabel_size);
+    toggleFilterFFTButton = new Button(x,y,w,h,toggleFilterFFTButtonText(),fontInfo.buttonLabel_size);
 
     x = calcButtonXLocation(Ibut++, win_x, w, xoffset,gutter_between_buttons);
     maxDisplayFreqButton = new Button(x,y,w,h,"Max Freq\n" + round(maxDisplayFreq_Hz[maxDisplayFreq_ind]) + " Hz",fontInfo.buttonLabel_size);
@@ -857,7 +860,7 @@ class Gui_Manager {
         smoothingButton.draw();
         showPolarityButton.draw();
         maxDisplayFreqButton.draw();
-    toggleFilterFFTButton.draw();
+        toggleFilterFFTButton.draw();
         
         break;
       default:  //assume GUI_PAGE_CHANNEL_ONOFF:
